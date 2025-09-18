@@ -116,7 +116,7 @@ public class principal
 			if(manejoDeMenu == 2)
 			{
 				//Creacion del estilo de archivo
-				raf.writeUTF("----[CONTENIDO DEL ARCHIVO]--------------------" + "\n");
+				System.out.println("----[CONTENIDO DEL ARCHIVO]--------------------" + "\n");
 				raf.writeUTF("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
 				
 				//Va "\\" por ERROR de caracter escape
