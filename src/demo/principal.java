@@ -34,13 +34,12 @@ public class principal
 		Integer manejoDeMenu;
 		
 		//Registro de nombre en objeto Archivo
-		System.out.println("Ingrese nombre de archivo: ");
+		System.out.println("Ingrese nombre de archivo (CONSOLA): ");
 		
 		Archivo archivoACrear = new Archivo();
 		
 		String nombreArchivo = scanner.nextLine();
 		
-		RandomAccessFile raf = new RandomAccessFile(nombreArchivo,"rw");
 		
 		archivoACrear.setNombreArchivo(nombreArchivo);
 		
@@ -116,20 +115,20 @@ public class principal
 			if(manejoDeMenu == 2)
 			{
 				//Creacion del estilo de archivo
-				System.out.println("----[CONTENIDO DEL ARCHIVO]--------------------" + "\n");
-				raf.writeUTF("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
+				System.out.println("----[CONTENIDO DEL ARCHIVO (CONSOLA)]--------------------" + "\n");
+				System.out.println("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
 				
 				//Va "\\" por ERROR de caracter escape
-				raf.writeUTF("Full filename: " + directorioActual + "\\" + archivoACrear.getNombreArchivo() + "\n");
-				raf.writeUTF("Fecha de ultimo acceso: " + archivoACrear.getFechaModif() + "\n");
-				raf.writeUTF("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados() + "\n");
+				System.out.println("Full filename: " + directorioActual + "\\" + archivoACrear.getNombreArchivo() + "\n");
+				System.out.println("Fecha de ultimo acceso: " + archivoACrear.getFechaModif() + "\n");
+				System.out.println("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados() + "\n");
 				
 				// Itero Atributos generados
 				for(int i = 0; i < archivoACrear.getCamposConfigurados(); i++)
 				{
 					String descripcionAMostrar = archivoACrear.getDescripcionCampo().get(i);
 					
-					raf.writeUTF("Campo [codigo: " + (i+1) + ", descripcion: " + descripcionAMostrar + "]\n");
+					System.out.println("Campo [codigo: " + (i+1) + ", descripcion: " + descripcionAMostrar + "]\n");
 				}
 				
 				//Ingreso cant de contactos a crear
@@ -141,10 +140,10 @@ public class principal
 				archivoACrear.setCantRegistros(cantContactos);
 				
 				//Dato Cant Registros generados
-				raf.writeUTF("Cantidad de Registros (contactos): " + archivoACrear.getCantRegistros() + "\n");
+				System.out.println("Cantidad de Registros (contactos): " + archivoACrear.getCantRegistros() + "\n");
 				
 				//Separador header del body
-				raf.writeUTF("-----------------------------------------------\n");
+				System.out.println("-----------------------------------------------\n");
 				
 				for(int i = 0; i < archivoACrear.getCantRegistros(); i++)
 				{
@@ -176,7 +175,7 @@ public class principal
 						
 						String nomCampo = archivoACrear.getDescripcionCampo(nroPersona);
 						
-						raf.writeUTF(nomCampo + " : " + datoPersona + "\n");
+						System.out.println(nomCampo + " : " + datoPersona + "\n");
 			        }
 					
 					//Limpio Lista de basura
@@ -185,7 +184,7 @@ public class principal
 					archivoACrear.setInfoCampo(mapAux);
 					
 					//Separador de personas
-					raf.writeUTF("-----------------------------------------------\n");
+					System.out.println("-----------------------------------------------\n");
 					
 				}
 				
@@ -200,7 +199,7 @@ public class principal
 		}while(manejoDeMenu != 0);
 		
 		//Libero Memoria
-		raf.close();
+		scanner.close();
 		
 	}
 }
