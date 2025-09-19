@@ -53,9 +53,10 @@ public class principalMain
 
         }
 
-        /*
-        System.out.println("Seguir? (0 para salir): ");
-        menu = scanner.nextInt();
+        //Definir cantidad de registros:
+        int cantRegistros = 0;
+        System.out.println("Ingrese cantidad de contactos a guardar: ");
+        cantRegistros = scanner.nextInt();
         scanner.nextLine();
 		*/
 		
