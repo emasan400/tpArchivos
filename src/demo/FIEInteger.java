@@ -4,7 +4,7 @@ import java.io.RandomAccessFile;
 
 public class FIEInteger
 {
-	private RandomAccessFile raf;
+	private static RandomAccessFile raf;
 	
 	public FIEInteger(RandomAccessFile raf)
 	{
@@ -16,7 +16,7 @@ public class FIEInteger
 		return raf.readUnsignedShort();
 	}
 
-	public void write(int i) throws Exception
+	public static void write(int i) throws Exception
 	{
 		raf.writeShort(i);
 	}

@@ -4,34 +4,64 @@ import java.io.RandomAccessFile;
 import java.util.Random;
 import java.util.Scanner;
 
+import static demo.FIERegType.*;
+
 public class principalMain
 {
 	
-	private static void escribirArchivo(RandomAccessFile raf, FIEString s, FIEInteger i, FIEDate d, String nombreArchivo) throws Exception{
-		
+	private static void escribirArchivo(RandomAccessFile raf, String nombreArchivo) throws Exception{
+
+        Scanner scanner = new Scanner(System.in);
+
 		String directorioActual = System.getProperty("user.dir");
 		
 		Random random = new Random();
-		Integer nroSerie = random.nextInt(10000)+1;
-		String nroSerieString = nroSerie.toString();
+		int nroSerie = random.nextInt(10000)+1;
+		String nroSerieString = String.valueOf(nroSerie);
 		
 		//Voy al inicio del archivo
 		raf.seek(0);
-		s.write("----[CONTENIDO DEL ARCHIVO]--------------------");
-		s.write("Nro. de serie: " + nroSerieString);
-		s.write("Full filename: " + nombreArchivo);
-		s.write("Fecha de ultimo acceso: ");
-		
-		d.write();
+
+        //Guardo nroSerieString
+		FIEString.write(nroSerieString);
+
+        //Guardo nombreArchivo
+		FIEString.write(nombreArchivo);
+
+        //Escribir date
+		FIEDate.write();
 		
 		//Completar con RegType
-		int campos = 00;
-		s.write("Cantidad de campos configurados: ");
-		
+        int campos = 1;
+
+        //Definir cantidad de campos:
+        int cantCampos = 0;
+        System.out.println("Ingrese cantidad de campos configurables: ");
+        cantCampos = scanner.nextInt();
+        scanner.nextLine();
+
+        //Escribo cantCampos
+        FIEInteger.write(cantCampos);
+
+        //Escribo registros en archivo con iteracion < cantCampos
+        for(int val = 0; val < cantCampos; val++)
+        {
+            System.out.println("Nombre de atributo " + (campos) + ": ");
+            String nomAtributo = scanner.nextLine();
+
+            escribirRegType(campos, nomAtributo);
+
+        }
+
+        /*
+        System.out.println("Seguir? (0 para salir): ");
+        menu = scanner.nextInt();
+        scanner.nextLine();
+		*/
 		
 	}
 	
-	public static void main(String[] args) throws Exception
+	static void main(String[] args) throws Exception
 	{	
 		
 		Scanner scanner = new Scanner(System.in);
@@ -44,12 +74,7 @@ public class principalMain
 		
 		RandomAccessFile raf = new RandomAccessFile(nombreArchivo,"rw");
 		
-		FIEInteger i = new FIEInteger(raf);
-		FIEString s = new FIEString(raf);
-		FIEDate d = new FIEDate(raf);
-		
-		
-		escribirArchivo(raf,s,i,d, nombreArchivo);
+		escribirArchivo(raf, nombreArchivo);
 		
 	}
 

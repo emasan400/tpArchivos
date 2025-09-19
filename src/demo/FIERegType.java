@@ -1,34 +1,20 @@
 package demo;
 
 import java.io.RandomAccessFile;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class FIERegType
 {
-	private RandomAccessFile raf;
-	
-	public FIERegType(RandomAccessFile raf)
-	{
-		this.raf = raf;
-	}
-	
-	public int escribirRegType() throws Exception
-	{
-		int camposDefinidos = 0;
-		
-		
-		String ingreso = "";
-		
-		do{
-			
-		}while(ingreso != "-");
-		
-		return camposDefinidos;
-	}
+    private static RandomAccessFile raf;
 
-	public void leerRegType() throws Exception
+    public FIERegType(RandomAccessFile raf)
 	{
-		raf.writeShort();
-	}
+        RandomAccessFile raf1 = this.raf;
+    }
+
+    public static void escribirRegType(int dato, String campo) throws Exception {
+
+        FIEInteger.write(dato);
+        FIEString.write(campo);
+        
+    }
 }

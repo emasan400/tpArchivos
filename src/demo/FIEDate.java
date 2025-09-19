@@ -22,7 +22,7 @@ public class FIEDate
 		return fechaLeida;
 	}
 	
-	public void write() throws Exception
+	public static void write() throws Exception
 	{
 		Date hoy = new Date();
         raf.writeLong(hoy.getTime());

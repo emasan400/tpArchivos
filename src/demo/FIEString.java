@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 public class FIEString
 {
-	private RandomAccessFile raf;
+	private static RandomAccessFile raf;
 	
 	public FIEString(RandomAccessFile raf)
 	{
@@ -35,7 +35,7 @@ public class FIEString
         return new String(buffer, StandardCharsets.UTF_8);
     }
 	
-    public void write(String s) throws Exception {
+    public static void write(String s) throws Exception {
     	
         byte[] stringEnBytes = s.getBytes(StandardCharsets.UTF_8);
         
