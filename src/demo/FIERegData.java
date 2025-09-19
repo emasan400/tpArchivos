@@ -5,7 +5,7 @@ package demo;/*
  * 
  */
 
-public class RegData
+public class FIERegData
 {
 
 }
