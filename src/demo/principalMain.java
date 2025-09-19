@@ -1,10 +1,7 @@
 package demo;
 
 import java.io.RandomAccessFile;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 import static demo.FIERegType.*;
 
@@ -20,18 +17,22 @@ public class principalMain
 		Random random = new Random();
 		int nroSerie = random.nextInt(10000)+1;
 		String nroSerieString = String.valueOf(nroSerie);
-		
+
+        FIEInteger i = new FIEInteger(raf);
+        FIEString s = new FIEString(raf);
+        FIEDate d = new FIEDate(raf);
+
 		//Voy al inicio del archivo
 		raf.seek(0);
 
         //Guardo nroSerieString
-		FIEString.write(nroSerieString);
+		s.write(nroSerieString);
 
         //Guardo nombreArchivo
-		FIEString.write(nombreArchivo);
+		s.write(directorioActual+"\\"+nombreArchivo);
 
         //Escribir date
-		FIEDate.write();
+		d.write();
 		
 		//Completar con RegType
         int campos = 1;
@@ -43,7 +44,7 @@ public class principalMain
         scanner.nextLine();
 
         //Escribo cantCampos
-        FIEInteger.write(cantCampos);
+        i.write(cantCampos);
 
         //Guardo datos en un map
         Map<Integer,String> camposConfigurados = new LinkedHashMap<>();
@@ -51,14 +52,14 @@ public class principalMain
         //Escribo registros en archivo con iteracion < cantCampos
         for(int val = 0; val < cantCampos; val++)
         {
-            System.out.println("Nombre de atributo " + (campos) + ": ");
+            System.out.println("Nombre de campo " + (val+1) + ": ");
             String nomAtributo = scanner.nextLine();
 
             //Escribo en archivo campos configurados
-            escribirRegType(campos, nomAtributo);
+            escribirRegType((val+1), nomAtributo);
 
             //Guardo dato para escribir registros
-            camposConfigurados.put(campos, nomAtributo);
+            camposConfigurados.put((val+1), nomAtributo);
 
         }
 
@@ -78,14 +79,14 @@ public class principalMain
                 String value = entry.getValue();
 
                 //Ingreso valor a escribir
-                System.out.println("Ingrese " + value + " (Saltar campo con \"_\"): ");
+                System.out.println("Ingrese " + value + " de registro " + (val+1) + " (Saltar campo con \"-\"): ");
                 String contenidoCampo = scanner.nextLine();
 
                 //Escribo con escape
-                if(contenidoCampo != "-")
+                if(!Objects.equals(contenidoCampo, "-"))
                 {
-                    FIEInteger.write(key);
-                    FIEString.write(contenidoCampo);
+                    i.write(key);
+                    s.write(contenidoCampo);
                 }
             }
         }

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class FIEDate
 {
-	private RandomAccessFile raf;
+	private static RandomAccessFile raf;
 	
 	public FIEDate(RandomAccessFile raf)
 	{

@@ -9,7 +9,7 @@ public class FIEString
 	
 	public FIEString(RandomAccessFile raf)
 	{
-		this.raf = raf;
+		FIEString.raf = raf;
 	}
 	
 	public String read() throws Exception {
