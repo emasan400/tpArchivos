@@ -1,6 +1,8 @@
 package demo;
 
 import java.io.RandomAccessFile;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -43,13 +45,20 @@ public class principalMain
         //Escribo cantCampos
         FIEInteger.write(cantCampos);
 
+        //Guardo datos en un map
+        Map<Integer,String> camposConfigurados = new LinkedHashMap<>();
+
         //Escribo registros en archivo con iteracion < cantCampos
         for(int val = 0; val < cantCampos; val++)
         {
             System.out.println("Nombre de atributo " + (campos) + ": ");
             String nomAtributo = scanner.nextLine();
 
+            //Escribo en archivo campos configurados
             escribirRegType(campos, nomAtributo);
+
+            //Guardo dato para escribir registros
+            camposConfigurados.put(campos, nomAtributo);
 
         }
 
@@ -58,8 +67,28 @@ public class principalMain
         System.out.println("Ingrese cantidad de contactos a guardar: ");
         cantRegistros = scanner.nextInt();
         scanner.nextLine();
-		*/
-		
+
+        // Escribo registros
+        for(int val = 0; val < cantRegistros; val++)
+        {
+            for(Map.Entry<Integer,String> entry : camposConfigurados.entrySet())
+            {
+                //Entro y leo camposConfigurados
+                Integer key = entry.getKey();
+                String value = entry.getValue();
+
+                //Ingreso valor a escribir
+                System.out.println("Ingrese " + value + " (Saltar campo con \"_\"): ");
+                String contenidoCampo = scanner.nextLine();
+
+                //Escribo con escape
+                if(contenidoCampo != "-")
+                {
+                    FIEInteger.write(key);
+                    FIEString.write(contenidoCampo);
+                }
+            }
+        }
 	}
 	
 	static void main(String[] args) throws Exception
