@@ -9,7 +9,7 @@ package demo;/*
  * Luego, habrá que desarrollar otro programa que interactúe con el usuario para generar un nuevo archivo, con la misma
  * estructura que el anterior, y los datos que ingrese el usuario
  * 
- * Ultima fecha modif: 03/09
+ * Ultima fecha modif: 19/09
  */
 
 import java.io.IOException;
