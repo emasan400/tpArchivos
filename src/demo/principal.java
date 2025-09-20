@@ -34,13 +34,12 @@ public class principal
 		Integer manejoDeMenu;
 		
 		//Registro de nombre en objeto Archivo
-		System.out.println("Ingrese nombre de archivo: ");
+		System.out.println("Ingrese nombre de archivo (CONSOLA): ");
 		
 		Archivo archivoACrear = new Archivo();
 		
 		String nombreArchivo = scanner.nextLine();
 		
-		RandomAccessFile raf = new RandomAccessFile(nombreArchivo,"rw");
 		
 		archivoACrear.setNombreArchivo(nombreArchivo);
 		
@@ -78,10 +77,10 @@ public class principal
 			if(manejoDeMenu == 1)
 			{
 				//Valor de corte de control para atributos
-				Integer corteDeControl = 1;
+				int corteDeControl = 1;
 				
 				//Modificador de codigo Atributo
-				Integer codAtributo = 0;
+				int codAtributo = 0;
 				
 				//Nombre de atributo
 				String nomAtributo = new String();
@@ -92,11 +91,11 @@ public class principal
 					System.out.println("Nombre de atributo "+ (codAtributo+1) +": ");
 					nomAtributo = scanner.nextLine();
 					
-					//Setteo en map info obtenida
-					archivoACrear.setDescripcionCampo(codAtributo,nomAtributo);
+					//Setteo en campo info obtenida
+					archivoACrear.setCampo(codAtributo,nomAtributo,"");
 					
 					//Setteo cantidad de Atributos
-					Integer campConfAux = archivoACrear.getCamposConfigurados();
+					int campConfAux = archivoACrear.getCamposConfigurados();
 					archivoACrear.setCamposConfigurados(campConfAux + 1);
 					
 					//Modifico valores auxiliares
@@ -116,20 +115,20 @@ public class principal
 			if(manejoDeMenu == 2)
 			{
 				//Creacion del estilo de archivo
-				raf.writeUTF("----[CONTENIDO DEL ARCHIVO]--------------------" + "\n");
-				raf.writeUTF("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
+				System.out.println("----[CONTENIDO DEL ARCHIVO (CONSOLA)]--------------------" + "\n");
+				System.out.println("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
 				
 				//Va "\\" por ERROR de caracter escape
-				raf.writeUTF("Full filename: " + directorioActual + "\\" + archivoACrear.getNombreArchivo() + "\n");
-				raf.writeUTF("Fecha de ultimo acceso: " + archivoACrear.getFechaModif() + "\n");
-				raf.writeUTF("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados() + "\n");
+				System.out.println("Full filename: " + directorioActual + "\\" + archivoACrear.getNombreArchivo() + "\n");
+				System.out.println("Fecha de ultimo acceso: " + archivoACrear.getFechaModif() + "\n");
+				System.out.println("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados() + "\n");
 				
 				// Itero Atributos generados
 				for(int i = 0; i < archivoACrear.getCamposConfigurados(); i++)
 				{
-					String descripcionAMostrar = archivoACrear.getDescripcionCampo().get(i);
+					String descripcionAMostrar = archivoACrear.getCampo(i).getdCampo();
 					
-					raf.writeUTF("Campo [codigo: " + (i+1) + ", descripcion: " + descripcionAMostrar + "]\n");
+					System.out.println("Campo [codigo: " + (i+1) + ", descripcion: " + descripcionAMostrar + "]\n");
 				}
 				
 				//Ingreso cant de contactos a crear
@@ -141,10 +140,10 @@ public class principal
 				archivoACrear.setCantRegistros(cantContactos);
 				
 				//Dato Cant Registros generados
-				raf.writeUTF("Cantidad de Registros (contactos): " + archivoACrear.getCantRegistros() + "\n");
+				System.out.println("Cantidad de Registros (contactos): " + archivoACrear.getCantRegistros() + "\n");
 				
 				//Separador header del body
-				raf.writeUTF("-----------------------------------------------\n");
+				System.out.println("-----------------------------------------------\n");
 				
 				for(int i = 0; i < archivoACrear.getCantRegistros(); i++)
 				{
@@ -156,36 +155,39 @@ public class principal
 						String contenidoCampo = new String();
 						
 						//Consigo nombre del campo
-						String nomCampo = archivoACrear.getDescripcionCampo(j);
+						String nomCampo = archivoACrear.getCampo(j).getdCampo();
 						System.out.println("Ingrese " + nomCampo + " para persona "+ (i+1) +" (\"-\" para no agregar info): ");
 						contenidoCampo = scanner.nextLine();
 						
 						//Meto info en el map infoCampo solo si tiene contenido
 						if(!contenidoCampo.equals("-"))
 						{
-							archivoACrear.setInfoCampo(j,contenidoCampo);
+							archivoACrear.getCampo(j).setiCampo(contenidoCampo);
 						}
 						
 					}
 					
 					//Escribo nueva persona en archivo
-					for (Entry<Integer, String> entry : archivoACrear.getInfoCampo().entrySet()) {
-						
-						Integer nroPersona = entry.getKey();
-						String datoPersona = entry.getValue();
-						
-						String nomCampo = archivoACrear.getDescripcionCampo(nroPersona);
-						
-						raf.writeUTF(nomCampo + " : " + datoPersona + "\n");
-			        }
-					
-					//Limpio Lista de basura
-					Map<Integer,String> mapAux = new LinkedHashMap<>();
-					
-					archivoACrear.setInfoCampo(mapAux);
+					//for (Entry<Integer, String> entry : archivoACrear.getInfoCampo().entrySet()) {
+
+						//Integer nroPersona = entry.getKey();
+						//String datoPersona = entry.getValue();
+
+						//String nomCampo = archivoACrear.getDescripcionCampo(nroPersona);
+
+						//System.out.println(nomCampo + " : " + datoPersona + "\n");
+			        //}
+
+                    for(Campo c : archivoACrear.getListCampo()){
+                        int nroCampo = c.getnCampo();
+                        String descCampo = c.getdCampo();
+                        String infoCampo = c.getiCampo();
+
+                        System.out.println(nroCampo + " : " + descCampo + " : " + infoCampo + "\n");
+                    }
 					
 					//Separador de personas
-					raf.writeUTF("-----------------------------------------------\n");
+					System.out.println("-----------------------------------------------\n");
 					
 				}
 				
@@ -200,7 +202,7 @@ public class principal
 		}while(manejoDeMenu != 0);
 		
 		//Libero Memoria
-		raf.close();
+		scanner.close();
 		
 	}
 }
