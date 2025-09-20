@@ -11,7 +11,7 @@ public class FIEInteger
 		this.raf = raf;
 	}
 	
-	public int read() throws Exception
+	public static int read() throws Exception
 	{
 		return raf.readUnsignedShort();
 	}

@@ -8,17 +8,33 @@ public class Archivo
 	//Atributos clase Archivo
 	private int numeroSerie;
 	private String nombreArchivo;
-	private LocalDate fechaModif;
+	private String fechaModif;
 	private int camposConfigurados = 0;
     private int cantRegistros = 0;
 
     //Optimizo esto usando una nueva estructura
     private List<Campo> campos = new ArrayList<>();
 
+    //Prueba lista EMA
+    private  List<String> nomCamposConfigurados = new ArrayList<>();
+
+    public void setNomCamposConfigurados(String nomCampo) {
+        nomCamposConfigurados.add(nomCampo);
+    }
+
+    public String getNomCamposConfigurados(int numeroCampo) {
+
+        return nomCamposConfigurados.get(numeroCampo);
+
+    }
+
+    /*
     public void agregarCampo(Campo campo){
         campos.add(campo);
         camposConfigurados++;
     }
+
+     */
 	
 	//Getter - Setter nombreArchivo
 	public String getNombreArchivo()
@@ -41,6 +57,7 @@ public class Archivo
 	}
 
     //Getter - Setter campo
+    /*
     public Campo getCampo(int i){
         return  campos.get(i);
     }
@@ -52,12 +69,14 @@ public class Archivo
         agregarCampo(new Campo(n,d,i));
     }
 
+     */
+
 	//Getter - Setter fechaModif
-	public LocalDate getFechaModif()
+	public String getFechaModif()
 	{
 		return fechaModif;
 	}
-	public void setFechaModif(LocalDate fechaModif)
+	public void setFechaModif(String fechaModif)
 	{
 		this.fechaModif = fechaModif;
 	}

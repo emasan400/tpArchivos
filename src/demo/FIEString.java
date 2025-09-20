@@ -12,14 +12,13 @@ public class FIEString
 		FIEString.raf = raf;
 	}
 	
-	public String read() throws Exception {
+	public static String read() throws Exception {
 		
         int lengthByte = raf.readUnsignedByte();
         
         int length = 0;
         if(lengthByte < 255)
         	{
-        	
         		length = lengthByte;
         		
         	}else{

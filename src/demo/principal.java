@@ -1,4 +1,5 @@
-package demo;/*
+package demo;
+/*
  * Grupo 1: Tapia, Nemi, Meneclier, Sanchez
  * 
  * TP Archivos:
@@ -12,59 +13,273 @@ package demo;/*
  * Ultima fecha modif: 19/09
  */
 
-import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.time.LocalDate;
+import java.util.*;
+
+import static demo.FIERegType.escribirRegType;
 
 public class principal
 {
-	public static void main(String[] args) throws IOException
+    private static void escribirArchivo(RandomAccessFile raf, String nombreArchivo, Scanner scanner) throws Exception{
+
+        String directorioActual = System.getProperty("user.dir");
+
+        Random random = new Random();
+        int nroSerie = random.nextInt(10000)+1;
+
+        FIEInteger i = new FIEInteger(raf);
+        FIEString s = new FIEString(raf);
+        FIEDate d = new FIEDate(raf);
+
+        //Voy al inicio del archivo
+        raf.seek(0);
+
+        //Guardo nroSerieString
+        i.write(nroSerie);
+
+        //Guardo nombreArchivo
+        s.write(directorioActual+"\\"+nombreArchivo);
+
+        //Escribir date
+        d.write();
+
+        //Completar con RegType
+        int campos = 1;
+
+        //Definir cantidad de campos:
+        int cantCampos = 0;
+        System.out.println("Ingrese cantidad de campos configurables: ");
+        cantCampos = scanner.nextInt();
+        scanner.nextLine();
+
+        //Escribo cantCampos
+        i.write(cantCampos);
+
+        //Guardo datos en un map
+        Map<Integer,String> camposConfigurados = new LinkedHashMap<>();
+
+        //Escribo registros en archivo con iteracion < cantCampos
+        for(int val = 0; val < cantCampos; val++)
+        {
+            System.out.println("Nombre de campo " + (val+1) + ": ");
+            String nomAtributo = scanner.nextLine();
+
+            //Escribo en archivo campos configurados
+            escribirRegType((val+1), nomAtributo);
+
+            //Guardo dato para escribir registros
+            camposConfigurados.put((val+1), nomAtributo);
+
+        }
+
+        //Definir cantidad de registros:
+        int cantRegistros = 0;
+        System.out.println("Ingrese cantidad de contactos a guardar: ");
+        cantRegistros = scanner.nextInt();
+        scanner.nextLine();
+
+        //Escribo cantRegistros
+        i.write(cantRegistros);
+
+        // Escribo registros
+        for(int val = 0; val < cantRegistros; val++)
+        {
+            for(Map.Entry<Integer,String> entry : camposConfigurados.entrySet())
+            {
+                //Entro y leo camposConfigurados
+                Integer key = entry.getKey();
+                String value = entry.getValue();
+
+                //Ingreso valor a escribir
+                System.out.println("Ingrese " + value + " de registro " + (val+1) + " (Saltar campo con \"-\"): ");
+                String contenidoCampo = scanner.nextLine();
+
+                //Escribo con escape
+                if(!Objects.equals(contenidoCampo, "-"))
+                {
+                    i.write(key);
+                    s.write(contenidoCampo);
+                }
+            }
+        }
+    }
+
+    private static void leerArchivo(RandomAccessFile raf, String nombreArchivo, Scanner scanner, Archivo archivoACrear) throws Exception {
+
+        //Voy al inicio del archivo
+        raf.seek(0);
+
+        //Leo contenido y guardo en clase archivo!
+        //Numero de serie
+        archivoACrear.setNumeroSerie(FIEInteger.read());
+        //Nombre archivo
+        archivoACrear.setNombreArchivo(FIEString.read());
+        //FechaModif
+        archivoACrear.setFechaModif(FIEDate.read());
+        //CamposConfigurados
+        archivoACrear.setCamposConfigurados(FIEInteger.read());
+
+        //Creacion del estilo de archivo
+        System.out.println("----[CONTENIDO DEL ARCHIVO]--------------------");
+        System.out.println("Nro. de serie: " + archivoACrear.getNumeroSerie());
+
+        //Va "\\" por ERROR de caracter escape
+        System.out.println("Full filename: " + archivoACrear.getNombreArchivo());
+        System.out.println("Fecha de ultimo acceso: " + archivoACrear.getFechaModif());
+        System.out.println("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados());
+
+        // Itero Atributos generados
+        for(int i = 0; i < archivoACrear.getCamposConfigurados(); i++)
+        {
+            int nroCampo = FIEInteger.read();
+            String descripcionAMostrar = FIEString.read();
+
+            //archivoACrear.getCampo(i).getdCampo();
+
+            System.out.println("Campo [codigo: " + nroCampo + ", descripcion: " + descripcionAMostrar + "]");
+
+            archivoACrear.setNomCamposConfigurados(descripcionAMostrar);
+        }
+
+        /*
+        //Ingreso cant de contactos a crear
+        System.out.println("Ingrese cantidad de personas a crear: ");
+        Integer cantContactos = scanner.nextInt();
+        scanner.nextLine();
+        */
+
+        //Leo cant de contactos
+        int cantContactos = FIEInteger.read();
+
+        //Setteo dato de cant de contactos en objeto archivo
+        archivoACrear.setCantRegistros(cantContactos);
+
+        //Dato Cant Registros generados
+        System.out.println("Cantidad de Contactos: " + archivoACrear.getCantRegistros());
+
+        System.out.println("-----------------------------------------------");
+
+        // Iterar por cada contacto en el archivo
+        for (int i = 0; i < cantContactos; i++) {
+            // Variables para controlar la lectura del registro
+            int ultimoCampoLeido = 0;
+            boolean finRegistro = false;
+
+            //Leo si: CorteControl true y que posActual del puntero es menor al final del archivo (caso ultimo contacto)
+            while (!finRegistro && raf.getFilePointer() < raf.length()) {
+                long posicionActual = raf.getFilePointer();
+
+                // Verifico que haya dato a leer despues de mi pos actual (Final del archivo por si me paso (Sin ultimo campoConf))
+                if (posicionActual + 4 > raf.length()) {
+                    finRegistro = true;
+                    break;
+                }
+
+                int nroCampo = FIEInteger.read();
+
+                // Verificar si este campo pertenece al siguiente registro. Como leo secuencial siempre. Me avisa de cambio de reg.
+                if (nroCampo <= ultimoCampoLeido) {
+                    // Retroceder y terminar este registro
+                    raf.seek(posicionActual);
+                    finRegistro = true;
+                } else {
+                    // Leer el valor del campo
+                    String valorCampo = FIEString.read();
+
+                    // Mostrar el campo con su nombre
+                    String nombreCampo = archivoACrear.getNomCamposConfigurados(nroCampo - 1);
+                    System.out.println(nombreCampo + " : " + valorCampo);
+
+                    ultimoCampoLeido = nroCampo;
+                }
+                if(finRegistro == true)
+                    // Línea separadora solo entre registros
+                    System.out.println("-----------------------------------------------");
+            }
+        }
+
+        System.out.println("-----------------------------------------------");
+
+        System.out.println();
+        System.out.println("----[FIN CONTENIDO DEL ARCHIVO]-----------------");
+        /*
+        for(int i = 0; i < archivoACrear.getCantRegistros(); i++)
+        {
+
+            archivoACrear;
+        }
+        */
+        /* Ya esta hecho en funcion escribirArchivo! Solo quiero leer el archivo
+
+        for(int i = 0; i < archivoACrear.getCantRegistros(); i++) --> Usar!
+        {
+            for(int j = 0; j < archivoACrear.getCamposConfigurados(); j++)
+            {
+                //Almaceno contenido de campo
+                String contenidoCampo = new String();
+
+                //Consigo nombre del campo --> Usar
+                String nomCampo = archivoACrear.getCampo(j).getdCampo();
+
+                System.out.println("Ingrese " + nomCampo + " para persona "+ (i+1) +" (\"-\" para no agregar info): ");
+                contenidoCampo = scanner.nextLine();
+
+
+                //Meto info en el map infoCampo solo si tiene contenido
+                if(!contenidoCampo.equals("-"))
+                {
+                    --> Usar
+                    archivoACrear.getCampo(j).setiCampo(contenidoCampo);
+                }
+
+            }
+         */
+
+        /*
+            //Recorro lista
+            for(Campo c : archivoACrear.getListCampo()){
+                int nroCampo = c.getnCampo();
+                String descCampo = c.getdCampo();
+                String infoCampo = c.getiCampo();
+
+                System.out.println(nroCampo + " : " + descCampo + " : " + infoCampo + "\n");
+            }
+            //Separador de personas
+            System.out.println("-----------------------------------------------\n");
+            */
+
+        //Confirmacion de generacion del archivo
+        System.out.println();
+        System.out.println("-----------------------------------------------");
+        System.out.println("Archivo generado: " + archivoACrear.getNombreArchivo());
+        System.out.println("-----------------------------------------------");
+        System.out.println();
+    }
+
+
+	public static void main(String[] args) throws Exception
 	{
-		//Creo objeto para leer ingreso por linea de comando
-		Scanner scanner = new Scanner(System.in);
-		
 		//Int de ingreso de datos
 		Integer manejoDeMenu;
-		
-		//Registro de nombre en objeto Archivo
-		System.out.println("Ingrese nombre de archivo (CONSOLA): ");
-		
-		Archivo archivoACrear = new Archivo();
-		
-		String nombreArchivo = scanner.nextLine();
-		
-		
-		archivoACrear.setNombreArchivo(nombreArchivo);
-		
-		String directorioActual = System.getProperty("user.dir");
-		
-		//Registro de nro Serie en objeto Archivo con numero aleatorio
-		Random random = new Random();
-		
-		Integer nroSerie = random.nextInt(10000)+1;
-		
-		archivoACrear.setNumeroSerie(nroSerie);
-		
-		
-		//Registro de fecha modificacion en objeto Archivo
-		LocalDate fechaModif = LocalDate.now();
-		
-		archivoACrear.setFechaModif(fechaModif);
-		
-		
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Ingrese nombre y extension del archivo: ");
+
+        Archivo archivoACrear = new Archivo();
+
+        String nombreArchivo = scanner.nextLine();
+
+        nombreArchivo = nombreArchivo;
+
+        RandomAccessFile raf = new RandomAccessFile(nombreArchivo,"rw");
+
 		//Realizar proceso hasta que usuario ingrese 0
 		do{
 			
 			//Opciones de menu
 			System.out.println("Seleccione opcion: ");
-			System.out.println("1 - Definir registros ");
+			System.out.println("1 - Escribir archivo ");
 			System.out.println("2 - Mostrar ");
 			System.out.println("0 - Salir ");
 			
@@ -76,133 +291,23 @@ public class principal
 			//Opcion 1
 			if(manejoDeMenu == 1)
 			{
-				//Valor de corte de control para atributos
-				int corteDeControl = 1;
-				
-				//Modificador de codigo Atributo
-				int codAtributo = 0;
-				
-				//Nombre de atributo
-				String nomAtributo = new String();
-				
-				//Definicion de atributos de registros
-				while(corteDeControl != 0) {
-					//Nombre Atributo
-					System.out.println("Nombre de atributo "+ (codAtributo+1) +": ");
-					nomAtributo = scanner.nextLine();
-					
-					//Setteo en campo info obtenida
-					archivoACrear.setCampo(codAtributo,nomAtributo,"");
-					
-					//Setteo cantidad de Atributos
-					int campConfAux = archivoACrear.getCamposConfigurados();
-					archivoACrear.setCamposConfigurados(campConfAux + 1);
-					
-					//Modifico valores auxiliares
-					codAtributo = codAtributo + 1;
-					
-					//Seguir iterando?
-					System.out.println("Seguir creando atributos? Salir ingresando 0");
-					corteDeControl = scanner.nextInt();
-					//Consumir /n para evitar ERROR de buffer
-					scanner.nextLine(); 
-				}
-							
-			}
+                escribirArchivo(raf, nombreArchivo, scanner);
+            }
 				
 			
 			//Opcion 2
 			if(manejoDeMenu == 2)
 			{
-				//Creacion del estilo de archivo
-				System.out.println("----[CONTENIDO DEL ARCHIVO (CONSOLA)]--------------------" + "\n");
-				System.out.println("Nro. de serie: " + archivoACrear.getNumeroSerie() + "\n");
-				
-				//Va "\\" por ERROR de caracter escape
-				System.out.println("Full filename: " + directorioActual + "\\" + archivoACrear.getNombreArchivo() + "\n");
-				System.out.println("Fecha de ultimo acceso: " + archivoACrear.getFechaModif() + "\n");
-				System.out.println("Cantidad de campos configurados: " + archivoACrear.getCamposConfigurados() + "\n");
-				
-				// Itero Atributos generados
-				for(int i = 0; i < archivoACrear.getCamposConfigurados(); i++)
-				{
-					String descripcionAMostrar = archivoACrear.getCampo(i).getdCampo();
-					
-					System.out.println("Campo [codigo: " + (i+1) + ", descripcion: " + descripcionAMostrar + "]\n");
-				}
-				
-				//Ingreso cant de contactos a crear
-				System.out.println("Ingrese cantidad de personas a crear: ");
-				Integer cantContactos = scanner.nextInt();
-				scanner.nextLine();
-				
-				//Setteo dato de cant de contactos en objeto archivo
-				archivoACrear.setCantRegistros(cantContactos);
-				
-				//Dato Cant Registros generados
-				System.out.println("Cantidad de Registros (contactos): " + archivoACrear.getCantRegistros() + "\n");
-				
-				//Separador header del body
-				System.out.println("-----------------------------------------------\n");
-				
-				for(int i = 0; i < archivoACrear.getCantRegistros(); i++)
-				{
-							
-					for(int j = 0; j < archivoACrear.getCamposConfigurados(); j++)
-					{
-						
-						//Almaceno contenido de campo
-						String contenidoCampo = new String();
-						
-						//Consigo nombre del campo
-						String nomCampo = archivoACrear.getCampo(j).getdCampo();
-						System.out.println("Ingrese " + nomCampo + " para persona "+ (i+1) +" (\"-\" para no agregar info): ");
-						contenidoCampo = scanner.nextLine();
-						
-						//Meto info en el map infoCampo solo si tiene contenido
-						if(!contenidoCampo.equals("-"))
-						{
-							archivoACrear.getCampo(j).setiCampo(contenidoCampo);
-						}
-						
-					}
-					
-					//Escribo nueva persona en archivo
-					//for (Entry<Integer, String> entry : archivoACrear.getInfoCampo().entrySet()) {
-
-						//Integer nroPersona = entry.getKey();
-						//String datoPersona = entry.getValue();
-
-						//String nomCampo = archivoACrear.getDescripcionCampo(nroPersona);
-
-						//System.out.println(nomCampo + " : " + datoPersona + "\n");
-			        //}
-
-                    for(Campo c : archivoACrear.getListCampo()){
-                        int nroCampo = c.getnCampo();
-                        String descCampo = c.getdCampo();
-                        String infoCampo = c.getiCampo();
-
-                        System.out.println(nroCampo + " : " + descCampo + " : " + infoCampo + "\n");
-                    }
-					
-					//Separador de personas
-					System.out.println("-----------------------------------------------\n");
-					
-				}
-				
-				//Confirmacion de generacion del archivo (va "\\" por ERROR de caracter escape)
-				System.out.println();
-				System.out.println("-----------------------------------------------");
-				System.out.println("Archivo generado: " + directorioActual + "\\" + archivoACrear.getNombreArchivo());
-				System.out.println("-----------------------------------------------");
-				System.out.println();
-			}
+                leerArchivo(raf, nombreArchivo, scanner, archivoACrear);
+            }
 			
 		}while(manejoDeMenu != 0);
 		
 		//Libero Memoria
 		scanner.close();
+
+        //Cerrar archivo
+        raf.close();
 		
 	}
 }
